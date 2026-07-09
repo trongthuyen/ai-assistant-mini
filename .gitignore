@@ -3,5 +3,6 @@ __pycache__/
 *.pyc
 .venv/
 assets/articles/*.md
+assets/checklist.json
 !assets/articles/.gitkeep
 *.log
