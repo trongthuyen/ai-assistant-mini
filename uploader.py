@@ -53,6 +53,17 @@ def _wait_for_operation(client: genai.Client, operation, poll_seconds: float = 2
 
 def _upload_one(client: genai.Client, store_name: str, article: dict) -> str:
     display_name = article["slug"]
+
+    file_path = article["path"]
+    if file_path.endswith(".md") or file_path.endswith(".markdown"):
+        mime_type = "text/markdown"
+    elif file_path.endswith(".txt"):
+        mime_type = "text/plain"
+    elif file_path.endswith(".json"):
+        mime_type = "application/json"
+    else:
+        mime_type = "text/plain"
+
     operation = client.file_search_stores.upload_to_file_search_store(
         file=article["path"],
         file_search_store_name=store_name,
@@ -63,6 +74,7 @@ def _upload_one(client: genai.Client, store_name: str, article: dict) -> str:
                 {"key": "article_url", "string_value": article["url"]},
             ],
             "chunking_config": CHUNKING_CONFIG,
+            "mime_type": mime_type,
         },
     )
     _wait_for_operation(client, operation)
