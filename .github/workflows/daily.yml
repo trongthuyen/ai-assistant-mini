@@ -1,0 +1,33 @@
+name: Daily OptiBot Sync
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # 06:00 UTC every day
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # checklist.json (article hashes + store name) must
+      - name: Restore checklist.json
+        uses: actions/cache@v4
+        with:
+          path: assets/checklist.json
+          key: optibot-checklist-${{ github.run_id }}
+          restore-keys: |
+            optibot-checklist-
+
+      - name: Build image
+        run: docker build -t optibot-sync .
+
+      - name: Run daily sync
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          docker run --rm \
+            -e GEMINI_API_KEY="$GEMINI_API_KEY" \
+            -v "$PWD/assets:/app/assets" \
+            optibot-sync

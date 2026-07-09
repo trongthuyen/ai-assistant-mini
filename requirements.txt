@@ -1,0 +1,6 @@
+google-genai
+requests
+markdownify
+python-slugify
+python-dotenv
+tenacity
